@@ -1,6 +1,5 @@
 import Layout from "@/components/Layout";
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -8,23 +7,40 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Table,
-  Tbody,
-  Td,
   Text,
   Textarea,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react";
 import React from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
+import TableMessage from "@/components/TableMessage";
 
 const Index = () => {
+  const getMessages = async () => {
+    const baseUrl = "http://localhost:3000/api/message";
+    const { data } = await axios.get(baseUrl);
+    return await data;
+  };
+
+  const { isLoading, error, data, isSuccess } = useQuery(
+    "get-messages",
+    getMessages,
+    {
+      staleTime: 5000,
+      refetchInterval: 5000,
+    }
+  );
+
+  if (isLoading) return <div>Loading.....</div>;
+
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <Layout title="mama minta pulsa" subTitle="Modus Minta Pulsa">
       <Flex>
         <Box>
-          <Box w="md" border="1px" borderColor="gray.200" boxShadow="md">
+          {/* Request Pulsa Form  */}
+          <Box w="md" border="1px" borderColor="gray.200" p={2} boxShadow="md">
             <Text
               fontSize="xl"
               fontWeight="bold"
@@ -69,71 +85,10 @@ const Index = () => {
               </Button>
             </form>
           </Box>
+
+          {/* Message Table  */}
         </Box>
-        <Box flex="1">
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Date</Th>
-                <Th>Phone</Th>
-                <Th>Message</Th>
-                <Th>Status</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              <Tr>
-                <Td>1/1/2021</Td>
-                <Td>085267852222</Td>
-                <Td>
-                  Mama lagi di kantor polisi, kirim pulsa 10jt sekarang. CEPAT!
-                </Td>
-                <Td>
-                  <Badge colorScheme="yellow">Waiting</Badge>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>1/1/2021</Td>
-                <Td>08567832222</Td>
-                <Td>
-                  Mama lagi di kantor lurah, kirim pulsa 20jt sekarang. CEPAT!
-                </Td>
-                <Td>
-                  <Badge colorScheme="green">success</Badge>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>1/1/2021</Td>
-                <Td>085267852444</Td>
-                <Td>
-                  Mama lagi di mana mana, kirim pulsa 30jt sekarang. CEPAT !
-                </Td>
-                <Td>
-                  <Badge colorScheme="red">failed</Badge>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>1/1/2021</Td>
-                <Td>085267852444</Td>
-                <Td>
-                  Mama lagi di mana mana, kirim pulsa 30jt sekarang. CEPAT !
-                </Td>
-                <Td>
-                  <Badge colorScheme="red">failed</Badge>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>1/1/2021</Td>
-                <Td>085267852444</Td>
-                <Td>
-                  Mama lagi di mana mana, kirim pulsa 30jt sekarang. CEPAT !
-                </Td>
-                <Td>
-                  <Badge colorScheme="red">failed</Badge>
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </Box>
+        <Box flex="1">{isSuccess && <TableMessage data={data} />}</Box>
       </Flex>
     </Layout>
   );
