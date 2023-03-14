@@ -35,6 +35,115 @@ Berikut ini adalah langkah-langkah untuk setup Provider & DevTools React Query d
    }
    ```
 
+3. Buat file yang berisi komponen-komponen React yang memanfaatkan React Query
+
+   ```
+   import Layout from "@/components/Layout";
+   import {
+   Box,
+   Button,
+   Flex,
+   FormControl,
+   FormErrorMessage,
+   FormLabel,
+   Input,
+   Text,
+   Textarea,
+   } from "@chakra-ui/react";
+   import React from "react";
+   import { useQuery } from "react-query";
+   import axios from "axios";
+   import TableMessage from "@/components/TableMessage";
+
+   const Index = () => {
+   const getMessages = async () => {
+       const baseUrl = "http://localhost:3000/api/message";
+       const { data } = await axios.get(baseUrl);
+       return await data;
+   };
+
+   const { isLoading, error, data, isSuccess } = useQuery(
+       "get-messages",
+       getMessages,
+       {
+       staleTime: 5000,
+       refetchInterval: 5000,
+       }
+   );
+
+   if (isLoading) return <div>Loading.....</div>;
+
+   if (error) return <div>Error: {error.message}</div>;
+
+   return (
+       <Layout title="mama minta pulsa" subTitle="Modus Minta Pulsa">
+       <Flex>
+           <Box>
+           {/* Request Pulsa Form  */}
+           <Box w="md" border="1px" borderColor="gray.200" p={2} boxShadow="md">
+               <Text
+               fontSize="xl"
+               fontWeight="bold"
+               mb={4}
+               pb={2}
+               borderBottom="1px"
+               borderColor="gray.200"
+               >
+               Request Pulsa
+               </Text>
+               <form>
+               <FormControl pb={4}>
+                   <FormLabel
+                   htmlFor="phoneNumber"
+                   fontWeight="bold"
+                   fontSize="xs"
+                   letterSpacing="1px"
+                   textTransform="uppercase"
+                   >
+                   Phone Number
+                   </FormLabel>
+                   <Input name="phoneNumber" placeholder="Phone Number" />
+                   <FormErrorMessage></FormErrorMessage>
+               </FormControl>
+
+               <FormControl>
+                   <FormLabel
+                   htmlFor="name"
+                   fontWeight="bold"
+                   fontSize="xs"
+                   letterSpacing="1px"
+                   textTransform="uppercase"
+                   >
+                   Message
+                   </FormLabel>
+                   <Textarea placeholder="Bullshit Message" />
+                   <FormErrorMessage></FormErrorMessage>
+               </FormControl>
+
+               <Button mt={4} colorScheme="teal" type="submit">
+                   Send
+               </Button>
+               </form>
+           </Box>
+
+           {/* Message Table  */}
+           </Box>
+           <Box flex="1">{isSuccess && <TableMessage data={data} />}</Box>
+       </Flex>
+       </Layout>
+   );
+   };
+
+   export default Index;
+   ```
+
+   Code di atas merupakan contoh implementasi React Query di Next.js untuk melakukan fetching data dari API dan menampilkannya pada aplikasi web.
+
+   - Kemudian pada baris selanjutnya, diimpor juga React Query dan Axios untuk melakukan fetching data dari API.
+   - Kemudian, terdapat sebuah fungsi getMessages yang digunakan untuk melakukan request ke API untuk mengambil data message. Fungsi ini digunakan di dalam useQuery untuk melakukan fetching data dengan nama query "get-messages", dengan mengatur staleTime dan refetchInterval agar data di-cache dan di-refresh setiap 5 detik.
+   - Selanjutnya, terdapat pengecekan pada status loading dan error dari query. Jika masih dalam status loading, akan ditampilkan pesan "Loading...". Jika terjadi error, akan ditampilkan pesan error.
+   - Setelah itu, Di dalam elemen Box kedua terdapat komponen TableMessage yang akan menampilkan data pesan yang berhasil diambil dari API.
+
 ## NextJS API
 
 Untuk membuat API di Next.js, kita dapat menggunakan fitur Next.js yang disebut API Routes. Berikut adalah langkah-langkah untuk membuat API di Next.js:
